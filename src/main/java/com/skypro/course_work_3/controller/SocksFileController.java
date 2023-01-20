@@ -1,12 +1,12 @@
 package com.skypro.course_work_3.controller;
 
-import com.skypro.course_work_3.dto.DtoSocks;
+import com.skypro.course_work_3.exception.FileError;
 import com.skypro.course_work_3.service.impl.SocksService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,15 +21,17 @@ public class SocksFileController {
     public SocksFileController(SocksService socksService) {
         this.socksService = socksService;
     }
-
     @Operation(summary = "Экспортировать файл")
     @GetMapping("/export/socks")
-    public FileSystemResource downloadDataFile() throws IOException {
-        return socksService.exportData();
+    public FileSystemResource downloadDataFile() {
+        try {
+            return socksService.exportData();
+        } catch (IOException e) {
+            throw new FileError("Файл не экспортирован");
+        }
     }
-
     @Operation(summary = "Импортировать файл")
-    @PutMapping(value = "/import/socks")
+    @PutMapping(value = "/import/socks", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> uploadDataFile(@RequestParam MultipartFile file) {
         socksService.cleanDataFile();
         File dataFile = socksService.getDataFile();

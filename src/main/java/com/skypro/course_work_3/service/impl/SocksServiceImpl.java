@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skypro.course_work_3.dto.DtoSocks;
 import com.skypro.course_work_3.exception.AddingError;
 import com.skypro.course_work_3.exception.ElementNotFound;
+import com.skypro.course_work_3.exception.FileError;
 import com.skypro.course_work_3.model.Color;
 import com.skypro.course_work_3.model.Size;
 import com.skypro.course_work_3.model.Socks;
@@ -83,16 +84,19 @@ public class SocksServiceImpl implements SocksService {
         return total;
     }
     @Override
-    public FileSystemResource exportData() throws IOException {
-        Path path = Files.createTempFile("export-", ".json");
+    public FileSystemResource exportData() {
+        try {
+            Path path = Files.createTempFile("export-", ".json");
         List<DtoSocks> socksList = new ArrayList<>();
         for (Map.Entry<Socks, Integer> entry : this.socksMap.entrySet()) {
             socksList.add(mapDto(entry.getKey(), entry.getValue()));
         }
         Files.write(path, objectMapper.writeValueAsBytes(socksList));
         return new FileSystemResource(path);
+        } catch (IOException e) {
+            throw new FileError("Ошибка при экспорте файла");
+        }
     }
-
     private DtoSocks mapDto(Socks socks, int quantity) {
         DtoSocks dtoSocks = new DtoSocks();
         dtoSocks.setColor(socks.getColor());
@@ -101,7 +105,6 @@ public class SocksServiceImpl implements SocksService {
         dtoSocks.setQuantity(quantity);
         return dtoSocks;
     }
-
     @Value("${path.to.data.file}")
     private String dataFilePath;
     @Value("${name.of.data.file}")
@@ -111,7 +114,6 @@ public class SocksServiceImpl implements SocksService {
     public File getDataFile() {
         return new File(dataFilePath + "/" + dataFileName);
     }
-
     @Override
     public boolean cleanDataFile() {
         try {

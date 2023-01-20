@@ -8,7 +8,6 @@ import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 public interface SocksService {
     void validateRequest(DtoSocks dtoSocks);
