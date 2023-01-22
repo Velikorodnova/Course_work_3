@@ -1,19 +1,15 @@
 package com.skypro.course_work_3.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Size {
 
-    S("size", 23),
-    M("size", 25),
-    L("size", 27);
-    private final String size;
+    S(23),
+    M(25),
+    L(27);
     private final int valueSize;
-
-    Size(String size, int valueSize) {
-        this.size = size;
+    Size(int valueSize) {
         this.valueSize = valueSize;
     }
 
@@ -23,9 +19,9 @@ public enum Size {
     }
 
     @JsonCreator
-    public Size forValues(String size, int valueSize) {
+    public Size forValues(int valueSize) {
         for (Size s : Size.values()) {
-            if (s.size.equals(size) && Integer.compare(s.valueSize, valueSize) == 0) {
+            if (s.valueSize == valueSize) {
                 return s;
             }
         }
